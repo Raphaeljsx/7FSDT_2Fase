@@ -5,7 +5,6 @@ describe('POST /posts', () => {
   it('deve criar um post', async () => {
     const res = await request(app)
       .post('/posts')
-      .set('Content-Type', 'application/json')
       .send({
         title: 'Post Teste',
         content: 'Conteúdo teste',
