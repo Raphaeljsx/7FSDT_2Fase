@@ -6,7 +6,10 @@ const findAllPosts = async () => {
 }
 
 const findByIdPost = async (id) => {
-  const result = await pool.query(`SELECT * FROM posts WHERE id = $1`, [id]);
+  const result = await pool.query(
+    `SELECT * FROM posts WHERE id = $1`,
+    [id]
+  );
   return result.rows[0];
 }
 
@@ -25,8 +28,8 @@ const removePost = async (id) => {
   return result.rows[0];
 }
 
-const searchPosts = async (title) => {
-  const result = await pool.query(`SELECT * FROM posts WHERE title ILIKE $1`, [`%${title}%`])
+const searchPosts = async (query) => {
+  const result = await pool.query(`SELECT * FROM posts WHERE title ILIKE $1`, [`%${query}%`])
   return result.rows;
 }
 

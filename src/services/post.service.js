@@ -8,22 +8,26 @@ const getPostById = async (id) => {
   return post
 }
 
-const createPost = async ({ title, content, author }) => {
+const createPost = ({ title, content, author }) => {
   if (!title || !content || !author) throw new Error('Campos obrigatórios não preenchidos')
   return model.createPost({ title, content, author })
 }
 
 const updatePost = async (id, data) => {
-  const post = await model.findByIdPost(id, data)
+  const post = await model.findByIdPost(id)
   if (!post) throw new Error('Post não encontrado')
-  return post;
+  return model.updatePost({ id, ...data });
 }
 
-const deletePost = async (id) => await model.removePost(id);
+const deletePost = async (id) => {
+  const post = await model.findByIdPost(id)
+  if (!post) throw new Error('Post não encontrado')
+  await model.removePost(id)
+};
 
-const searchPosts = async (title) => {
-  if (!title) throw new Error('Título é obrigatório')
-  return model.searchPosts(title)
+const searchPosts = (query) => {
+  if (!query) throw new Error('Query é obrigatório')
+  return model.searchPosts(query)
 }
 
 module.exports = {

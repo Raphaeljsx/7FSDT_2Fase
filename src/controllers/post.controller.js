@@ -1,9 +1,15 @@
 const service = require('../services/post.service')
 
 const getAll = async (req, res) => {
-  const posts = await service.getAllPosts();
-  res.status(200).json(posts);
-  if (!posts) return res.status(404).json({ message: 'Nenhum post encontrado' })
+  try {
+    const posts = await service.getAllPosts();
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ message: 'Nenhum post encontrado' })
+    }
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
 };
 
 const getById = async (req, res) => {
@@ -18,9 +24,9 @@ const getById = async (req, res) => {
 const create = async (req, res) => {
   try {
     const post = await service.createPost(req.body);
-    req.status(201).json({ message: 'Post criado com sucesso', post })
+    res.status(201).json({ message: 'Post criado com sucesso', post })
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(400).json({ message: error.message || 'Erro ao criar post' })
   }
 };
 
@@ -36,7 +42,7 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
   try {
     await service.deletePost(req.params.id);
-    res.status(204).send();
+    res.status(204).json({ message: 'Post deletado com sucesso' }).send();
   } catch (error) {
     res.status(404).json({ message: error.message })
   }
@@ -44,7 +50,7 @@ const remove = async (req, res) => {
 
 const search = async (req, res) => {
   try {
-    const posts = await service.searchPosts(req.query.title)
+    const posts = await service.searchPosts(req.query.query)
     res.status(200).json(posts);
   } catch (error) {
     res.status(400).json({ message: error.message })

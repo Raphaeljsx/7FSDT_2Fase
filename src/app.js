@@ -4,6 +4,6 @@ const routes = require('./routes/post.routes');
 const app = express();
 
 app.use(express.json());
-app.use(routes);
+app.use('/posts', routes);
 
 module.exports = app;
