@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: blog-api
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: blog-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: blog-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: blog-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: blog-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: blog-db
+          property: database
+
+databases:
+  - name: blog-db
+    plan: free
+    databaseName: blog
+    user: postgres
