@@ -2,11 +2,14 @@ import "dotenv/config";
 import app from "./app";
 import initDatabase from "./config/init-db";
 
-// Ajusta configurações do banco quando rodando localmente (fora do Docker)
-// Se DB_HOST for "postgres" (nome do container), ajusta para "localhost"
-if (process.env.DB_HOST === "postgres" && !process.env.DOCKER_CONTAINER) {
+// Ajusta configurações do banco apenas quando rodando localmente E usando Docker Compose
+// Não ajusta se estiver em produção (Render, etc)
+if (
+  process.env.NODE_ENV !== "production" &&
+  process.env.DB_HOST === "postgres" &&
+  !process.env.DOCKER_CONTAINER
+) {
   process.env.DB_HOST = "localhost";
-  // Ajusta a porta também, pois docker-compose expõe na 5433
   if (process.env.DB_PORT === "5432") {
     process.env.DB_PORT = "5433";
   }
