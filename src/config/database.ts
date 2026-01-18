@@ -9,13 +9,19 @@ function parseDatabaseUrl(url: string | undefined): PoolConfig | null {
     const normalizedUrl = url.replace(/^postgres:\/\//, "postgresql://");
     const parsedUrl = new URL(normalizedUrl);
     
+    // Detecta se é um host do Render (contém .render.com)
+    const isRenderHost = parsedUrl.hostname.includes('.render.com');
+    
     return {
       host: parsedUrl.hostname,
       port: parseInt(parsedUrl.port) || 5432,
       user: parsedUrl.username,
       password: parsedUrl.password,
       database: parsedUrl.pathname.slice(1), // Remove a barra inicial
-      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+      // SSL é obrigatório para Render (mesmo em desenvolvimento)
+      ssl: (process.env.NODE_ENV === "production" || isRenderHost) 
+        ? { rejectUnauthorized: false } 
+        : false,
     };
   } catch (error) {
     console.error("Erro ao parsear DATABASE_URL:", error);
@@ -31,8 +37,10 @@ const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL) || {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  // SSL é obrigatório em produção (Render, Heroku, etc)
-  ssl: process.env.NODE_ENV === "production" 
+  // SSL é obrigatório para Render (mesmo em desenvolvimento)
+  // Detecta se é host do Render
+  ssl: (process.env.NODE_ENV === "production" || 
+        (process.env.DB_HOST && process.env.DB_HOST.includes('.render.com'))) 
     ? { rejectUnauthorized: false } 
     : false,
 };
