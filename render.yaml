@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: blog-api
+    name: blogging-api
     env: node
     plan: free
     buildCommand: npm install && npm run build
@@ -9,30 +9,25 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000
-      - key: DB_HOST
-        fromDatabase:
-          name: blog-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: blog-db
-          property: port
-      - key: DB_USER
-        fromDatabase:
-          name: blog-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: blog-db
-          property: password
-      - key: DB_NAME
-        fromDatabase:
-          name: blog-db
-          property: database
+        value: 3000
+      # As variáveis abaixo serão configuradas automaticamente quando você conectar o banco
+      # Ou você pode configurá-las manualmente no painel do Render
+      - key: DATABASE_URL
+        sync: false  # Será configurado automaticamente ao conectar o PostgreSQL
+      # Alternativamente, você pode usar variáveis individuais:
+      # - key: DB_HOST
+      #   sync: false
+      # - key: DB_PORT
+      #   sync: false
+      # - key: DB_USER
+      #   sync: false
+      # - key: DB_PASSWORD
+      #   sync: false
+      # - key: DB_NAME
+      #   sync: false
 
 databases:
-  - name: blog-db
+  - name: blogging-db
     plan: free
     databaseName: blog
-    user: postgres
+    user: blog_user

@@ -71,6 +71,184 @@ A aplicação foi estruturada seguindo o padrão **MVC (Model-View-Controller)**
 
 ---
 
+## 🐳 Publicar Imagem no Docker Hub
+
+Para publicar a imagem da aplicação no Docker Hub, siga os passos abaixo:
+
+### Pré-requisitos
+
+- Conta no [Docker Hub](https://hub.docker.com/) (crie uma se não tiver)
+- Docker instalado e rodando
+
+### Passo a Passo
+
+1. **Faça login no Docker Hub**
+   ```bash
+   docker login
+   ```
+   Digite seu username e password quando solicitado.
+
+2. **Construa a imagem com uma tag apropriada**
+   
+   A tag deve seguir o formato: `seu-usuario/nome-da-imagem:versao`
+   
+   ```bash
+   docker build -t seu-usuario/blogging-api:latest .
+   ```
+   
+   Ou com uma versão específica:
+   ```bash
+   docker build -t seu-usuario/blogging-api:v1.0.0 .
+   ```
+
+3. **Verifique se a imagem foi criada**
+   ```bash
+   docker images
+   ```
+
+4. **Faça o push da imagem para o Docker Hub**
+   ```bash
+   docker push seu-usuario/blogging-api:latest
+   ```
+   
+   Ou para uma versão específica:
+   ```bash
+   docker push seu-usuario/blogging-api:v1.0.0
+   ```
+
+5. **Verifique no Docker Hub**
+   Acesse `https://hub.docker.com/r/seu-usuario/blogging-api` para confirmar que a imagem foi publicada.
+
+### Exemplo Completo
+
+```bash
+# 1. Login
+docker login
+
+# 2. Build da imagem
+docker build -t raphaelalves/blogging-api:latest .
+
+# 3. Push para o Docker Hub
+docker push raphaelalves/blogging-api:latest
+```
+
+### Usando a Imagem Publicada
+
+Depois de publicada, qualquer pessoa pode usar sua imagem com:
+
+```bash
+docker pull seu-usuario/blogging-api:latest
+docker run -p 3000:3000 seu-usuario/blogging-api:latest
+```
+
+### Scripts Automatizados
+
+Para facilitar o processo, o projeto inclui scripts que automatizam o build e push:
+
+**PowerShell (Windows):**
+```powershell
+.\docker-push.ps1 -username seu-usuario -tag latest
+```
+
+**Bash (Linux/Mac/WSL):**
+```bash
+chmod +x docker-push.sh
+./docker-push.sh seu-usuario latest
+```
+
+**Nota:** Substitua `seu-usuario` pelo seu username do Docker Hub em todos os comandos.
+
+---
+
+## ☁️ Deploy no Render
+
+O projeto está configurado para deploy no [Render](https://render.com/). Siga os passos abaixo:
+
+### Pré-requisitos
+
+- Conta no [Render](https://render.com/)
+- Repositório Git (GitHub, GitLab ou Bitbucket) conectado ao Render
+
+### Passo a Passo
+
+#### Opção 1: Usando render.yaml (Recomendado)
+
+1. **Conecte seu repositório ao Render**
+   - Acesse o [Dashboard do Render](https://dashboard.render.com/)
+   - Clique em "New +" → "Blueprint"
+   - Conecte seu repositório Git
+   - O Render detectará automaticamente o arquivo `render.yaml`
+
+2. **O Render criará automaticamente:**
+   - Um serviço Web (API)
+   - Um banco de dados PostgreSQL
+   - As variáveis de ambiente necessárias
+
+3. **Aguarde o deploy**
+   - O Render fará o build e deploy automaticamente
+   - Você receberá uma URL como: `https://seu-app.onrender.com`
+
+#### Opção 2: Configuração Manual
+
+1. **Crie um banco PostgreSQL**
+   - No Dashboard do Render, clique em "New +" → "PostgreSQL"
+   - Escolha o plano (Free disponível)
+   - Anote as credenciais do banco
+
+2. **Crie um serviço Web**
+   - Clique em "New +" → "Web Service"
+   - Conecte seu repositório Git
+   - Configure:
+     - **Name:** `blogging-api`
+     - **Environment:** `Node`
+     - **Build Command:** `npm install && npm run build`
+     - **Start Command:** `npm start`
+     - **Plan:** Free
+
+3. **Configure as Variáveis de Ambiente**
+   - Na seção "Environment" do serviço web:
+     - `NODE_ENV` = `production`
+     - `PORT` = `3000` (ou deixe vazio, o Render define automaticamente)
+     - Conecte o banco PostgreSQL criado (o Render criará automaticamente a `DATABASE_URL`)
+
+4. **Deploy**
+   - Clique em "Create Web Service"
+   - O Render fará o build e deploy automaticamente
+
+### Variáveis de Ambiente no Render
+
+O Render fornece automaticamente:
+- `DATABASE_URL` - Quando você conecta um banco PostgreSQL ao serviço
+- `PORT` - Porta onde a aplicação deve escutar (definida automaticamente)
+
+**Importante:** A aplicação está configurada para:
+- ✅ Escutar em `0.0.0.0` (necessário no Render)
+- ✅ Usar SSL na conexão PostgreSQL (obrigatório no Render)
+- ✅ Suportar `DATABASE_URL` ou variáveis individuais
+
+### Verificando o Deploy
+
+Após o deploy, você pode:
+- Acessar a API: `https://seu-app.onrender.com`
+- Acessar a documentação Swagger: `https://seu-app.onrender.com/api-docs`
+- Testar os endpoints conforme documentado
+
+### Troubleshooting
+
+**Erro de conexão com o banco:**
+- Verifique se o banco PostgreSQL está conectado ao serviço web
+- Confirme que a variável `DATABASE_URL` está configurada
+
+**Build falha:**
+- Verifique os logs no Dashboard do Render
+- Confirme que o TypeScript está compilando corretamente
+
+**Aplicação não inicia:**
+- Verifique se o servidor está escutando na porta correta
+- Confirme que todas as variáveis de ambiente estão configuradas
+
+---
+
 ## ✅ Fluxo Correto de Execução e Testes
 
 1. Subir os containers

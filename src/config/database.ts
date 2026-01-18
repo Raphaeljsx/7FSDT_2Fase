@@ -1,20 +1,42 @@
-import { Pool } from "pg";
+import { Pool, PoolConfig } from "pg";
 
-// Valida se as variáveis de ambiente estão definidas
-const requiredEnvVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+// Função para parsear DATABASE_URL (formato do Render)
+function parseDatabaseUrl(url: string | undefined): PoolConfig | null {
+  if (!url) return null;
 
-if (missingVars.length > 0) {
-  console.error('Variáveis de ambiente faltando:', missingVars.join(', '));
+  try {
+    // Normaliza postgres:// para postgresql:// (ambos são suportados)
+    const normalizedUrl = url.replace(/^postgres:\/\//, "postgresql://");
+    const parsedUrl = new URL(normalizedUrl);
+    
+    return {
+      host: parsedUrl.hostname,
+      port: parseInt(parsedUrl.port) || 5432,
+      user: parsedUrl.username,
+      password: parsedUrl.password,
+      database: parsedUrl.pathname.slice(1), // Remove a barra inicial
+      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+    };
+  } catch (error) {
+    console.error("Erro ao parsear DATABASE_URL:", error);
+    return null;
+  }
 }
 
-const pool = new Pool({
+// Configura a conexão com o banco
+// Prioriza DATABASE_URL (formato do Render), depois variáveis individuais
+const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL) || {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+  // SSL é obrigatório em produção (Render, Heroku, etc)
+  ssl: process.env.NODE_ENV === "production" 
+    ? { rejectUnauthorized: false } 
+    : false,
+};
+
+const pool = new Pool(dbConfig);
 
 export default pool;

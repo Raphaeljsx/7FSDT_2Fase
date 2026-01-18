@@ -6,16 +6,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const app_1 = __importDefault(require("./app"));
 const init_db_1 = __importDefault(require("./config/init-db"));
-// Debug temporário - remover depois
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_PORT:", process.env.DB_PORT);
-console.log("DB_NAME:", process.env.DB_NAME);
-console.log("NODE_ENV:", process.env.NODE_ENV);
+// Ajusta configurações do banco quando rodando localmente (fora do Docker)
+// Se DB_HOST for "postgres" (nome do container), ajusta para "localhost"
+if (process.env.DB_HOST === "postgres" && !process.env.DOCKER_CONTAINER) {
+    process.env.DB_HOST = "localhost";
+    // Ajusta a porta também, pois docker-compose expõe na 5433
+    if (process.env.DB_PORT === "5432") {
+        process.env.DB_PORT = "5433";
+    }
+}
 const PORT = parseInt(process.env.PORT || "3000", 10);
 (async () => {
     try {
         await (0, init_db_1.default)();
-        app_1.default.listen(PORT, () => {
+        app_1.default.listen(PORT, "0.0.0.0", () => {
             console.log(`O server rodando na porta ${PORT}`);
         });
     }

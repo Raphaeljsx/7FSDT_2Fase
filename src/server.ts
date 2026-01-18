@@ -2,11 +2,15 @@ import "dotenv/config";
 import app from "./app";
 import initDatabase from "./config/init-db";
 
-// Debug temporário - remover depois
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_PORT:", process.env.DB_PORT);
-console.log("DB_NAME:", process.env.DB_NAME);
-console.log("NODE_ENV:", process.env.NODE_ENV);
+// Ajusta configurações do banco quando rodando localmente (fora do Docker)
+// Se DB_HOST for "postgres" (nome do container), ajusta para "localhost"
+if (process.env.DB_HOST === "postgres" && !process.env.DOCKER_CONTAINER) {
+  process.env.DB_HOST = "localhost";
+  // Ajusta a porta também, pois docker-compose expõe na 5433
+  if (process.env.DB_PORT === "5432") {
+    process.env.DB_PORT = "5433";
+  }
+}
 
 const PORT: number = parseInt(process.env.PORT || "3000", 10);
 
@@ -14,7 +18,7 @@ const PORT: number = parseInt(process.env.PORT || "3000", 10);
   try {
     await initDatabase();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`O server rodando na porta ${PORT}`);
     });
   } catch (error) {
