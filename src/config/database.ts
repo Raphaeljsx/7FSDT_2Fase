@@ -3,15 +3,18 @@ import { Pool, PoolConfig } from "pg";
 
 // Ajusta configurações do banco quando rodando localmente (fora do Docker)
 // Se não estamos explicitamente em um container Docker, usa localhost:5433
+// Mas não ajusta em ambientes CI (GitHub Actions, etc)
 const isDockerContainer = process.env.DOCKER_CONTAINER === "true";
+const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
 
-if (!isDockerContainer) {
+if (!isDockerContainer && !isCI) {
   // Se DB_HOST é "postgres" (nome do container) ou não está definido,
   // ajusta para "localhost" para conectar do host ao container
   if (!process.env.DB_HOST || process.env.DB_HOST === "postgres") {
     process.env.DB_HOST = "localhost";
   }
   // Ajusta a porta para 5433 (porta exposta pelo docker-compose)
+  // Só ajusta se a porta não estiver explicitamente definida
   if (!process.env.DB_PORT || process.env.DB_PORT === "5432") {
     process.env.DB_PORT = "5433";
   }

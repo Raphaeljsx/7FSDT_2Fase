@@ -7,8 +7,12 @@ process.env.NODE_ENV = process.env.NODE_ENV || "test";
 process.env.PORT = process.env.PORT || "3000";
 
 // Configuração do banco de dados para testes
+// Detecta se estamos em ambiente CI (GitHub Actions, etc)
+const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+
 // Ajusta DB_HOST se for "postgres" (nome do container) para "localhost" em testes locais
-if (process.env.DB_HOST === "postgres") {
+// Mas não ajusta em ambientes CI
+if (!isCI && process.env.DB_HOST === "postgres") {
   process.env.DB_HOST = "localhost";
   // Ajusta a porta também, pois docker-compose expõe na 5433
   if (process.env.DB_PORT === "5432") {
@@ -16,9 +20,11 @@ if (process.env.DB_HOST === "postgres") {
   }
 }
 
-// Se não estiver definido no .env, usa valores padrão para ambiente local
+// Se não estiver definido no .env, usa valores padrão
+// Em CI, usa 5432 (porta padrão do PostgreSQL)
+// Em ambiente local, usa 5433 (porta exposta pelo docker-compose)
 process.env.DB_HOST = process.env.DB_HOST || "localhost";
-process.env.DB_PORT = process.env.DB_PORT || "5433";
+process.env.DB_PORT = process.env.DB_PORT || (isCI ? "5432" : "5433");
 process.env.DB_USER = process.env.DB_USER || "postgres";
 process.env.DB_PASSWORD = process.env.DB_PASSWORD || "postgres";
 process.env.DB_NAME = process.env.DB_NAME || "blog";
