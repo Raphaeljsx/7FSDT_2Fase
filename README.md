@@ -42,10 +42,10 @@ A aplicação foi estruturada seguindo o padrão **MVC (Model-View-Controller)**
 
 1.  **Clone o repositório**
    
-```bash
+   ```bash
    git clone https://github.com/bl-comunicacao/blogging.git
    cd blogging
-```
+   ```
 
 2.  **Configure as Variáveis de Ambiente (Opcional)**
     As variáveis de ambiente já estão configuradas no `docker-compose.yml`. 
