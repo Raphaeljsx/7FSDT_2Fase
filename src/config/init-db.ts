@@ -11,10 +11,27 @@ async function initDatabase(): Promise<void> {
   try {
     await pool.query("SELECT 1");
 
-    const tablesSqlPath = path.join(__dirname, "../tables.sql");
-    if (fs.existsSync(tablesSqlPath)) {
-      const tablesSql = fs.readFileSync(tablesSqlPath, "utf8");
-      await pool.query(tablesSql);
+    // Verifica se a tabela posts já existe antes de executar o SQL
+    const tableExistsResult = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'posts'
+      );
+    `);
+
+    const tableExists = tableExistsResult.rows[0].exists;
+
+    // Só executa o SQL se a tabela não existir
+    if (!tableExists) {
+      const tablesSqlPath = path.join(__dirname, "../tables.sql");
+      if (fs.existsSync(tablesSqlPath)) {
+        const tablesSql = fs.readFileSync(tablesSqlPath, "utf8");
+        await pool.query(tablesSql);
+        console.log("Tabelas criadas com sucesso.");
+      }
+    } else {
+      console.log("Tabelas já existem. Nenhuma alteração foi feita no banco de dados.");
     }
   } catch (error) {
     const dbError = error as ErrorWithCode;

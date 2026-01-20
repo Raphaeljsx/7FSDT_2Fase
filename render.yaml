@@ -1,20 +1,20 @@
 services:
   - type: web
     name: blogging-api
-    env: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    dockerfilePath: ./dockerfile
+    dockerContext: .
+    dockerImage: dodoomaisbrabro/blogging-api:latest
+    # Ou use buildFromGit: true se quiser que o Render faça build do Dockerfile
+    # buildFromGit: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
-      # As variáveis abaixo serão configuradas automaticamente quando você conectar o banco
-      # Ou você pode configurá-las manualmente no painel do Render
       - key: DATABASE_URL
         sync: false  # Será configurado automaticamente ao conectar o PostgreSQL
-      # Alternativamente, você pode usar variáveis individuais:
+      # Ou use variáveis individuais:
       # - key: DB_HOST
       #   sync: false
       # - key: DB_PORT

@@ -1,4 +1,21 @@
+import "dotenv/config";
 import { Pool, PoolConfig } from "pg";
+
+// Ajusta configurações do banco quando rodando localmente (fora do Docker)
+// Se não estamos explicitamente em um container Docker, usa localhost:5433
+const isDockerContainer = process.env.DOCKER_CONTAINER === "true";
+
+if (!isDockerContainer) {
+  // Se DB_HOST é "postgres" (nome do container) ou não está definido,
+  // ajusta para "localhost" para conectar do host ao container
+  if (!process.env.DB_HOST || process.env.DB_HOST === "postgres") {
+    process.env.DB_HOST = "localhost";
+  }
+  // Ajusta a porta para 5433 (porta exposta pelo docker-compose)
+  if (!process.env.DB_PORT || process.env.DB_PORT === "5432") {
+    process.env.DB_PORT = "5433";
+  }
+}
 
 // Função para parsear DATABASE_URL (formato do Render)
 function parseDatabaseUrl(url: string | undefined): PoolConfig | null {
@@ -32,11 +49,11 @@ function parseDatabaseUrl(url: string | undefined): PoolConfig | null {
 // Configura a conexão com o banco
 // Prioriza DATABASE_URL (formato do Render), depois variáveis individuais
 const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL) || {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST || "localhost",
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5433,
+  user: process.env.DB_USER || "postgres",
+  password: process.env.DB_PASSWORD || "postgres",
+  database: process.env.DB_NAME || "blog",
   // SSL é obrigatório para Render (mesmo em desenvolvimento)
   // Detecta se é host do Render
   ssl: (process.env.NODE_ENV === "production" || 
@@ -44,6 +61,16 @@ const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL) || {
     ? { rejectUnauthorized: false } 
     : false,
 };
+
+// Log de debug (apenas em desenvolvimento)
+if (process.env.NODE_ENV !== "production") {
+  console.log("Configuração do banco de dados:", {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    user: dbConfig.user,
+    database: dbConfig.database,
+  });
+}
 
 const pool = new Pool(dbConfig);
 

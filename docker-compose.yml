@@ -5,6 +5,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - DOCKER_CONTAINER=true
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres

@@ -1,1 +1,0 @@
-{"version":3,"file":"AppError.d.ts","sourceRoot":"","sources":["../../src/errors/AppError.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,qBAAa,QAAS,SAAQ,KAAK;IACjC,SAAgB,UAAU,EAAE,MAAM,CAAC;IACnC,SAAgB,aAAa,EAAE,OAAO,CAAC;IACvC,SAAgB,MAAM,EAAE,MAAM,CAAC;gBAG7B,OAAO,EAAE,MAAM,EACf,UAAU,GAAE,MAAY,EACxB,aAAa,GAAE,OAAc;CAShC"}
