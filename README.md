@@ -43,7 +43,6 @@ A aplicação foi estruturada seguindo o padrão **MVC (Model-View-Controller)**
 1.  **Clone o repositório**
     ```bash
     git clone https://github.com/Raphaeljsx/7FSDT_2Fase.git
-    cd blogging
     ```
 
 2.  **Configure as Variáveis de Ambiente (Opcional)**
