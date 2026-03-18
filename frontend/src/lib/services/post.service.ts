@@ -32,7 +32,7 @@ export async function createPost(data: PostCreate): Promise<Post> {
     errors.push("Título é obrigatório");
   if (!data.content || data.content.trim().length === 0)
     errors.push("Conteúdo é obrigatório");
-  if (!data.author || data.author.trim().length === 0)
+  if (data.author_id == null || data.author_id <= 0)
     errors.push("Autor é obrigatório");
 
   if (errors.length > 0)
@@ -64,7 +64,6 @@ export async function updatePost(
     id: idNumber,
     title: data.title !== undefined ? data.title : post.title,
     content: data.content !== undefined ? data.content : post.content,
-    author: data.author !== undefined ? data.author : post.author,
   };
 
   try {

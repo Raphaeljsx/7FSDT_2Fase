@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import * as authService from "@/lib/services/auth.service";
 
-export default function Login() {
+export default function Register() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from") ?? "/";
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,11 +18,11 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await authService.login(email, password);
-      router.push(from);
+      await authService.register({ email, password, name: name || undefined });
+      router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login");
+      setError(err instanceof Error ? err.message : "Erro ao cadastrar");
     } finally {
       setLoading(false);
     }
@@ -32,13 +31,26 @@ export default function Login() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm rounded-lg border border-zinc-700 bg-zinc-900/50 p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-center mb-6 text-white">Entrar</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 text-white">Cadastro</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {error && (
             <p className="text-sm text-red-400 bg-red-900/20 border border-red-800 rounded px-3 py-2">
               {error}
             </p>
           )}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-zinc-300 mb-1">
+              Nome (opcional)
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-md border border-zinc-600 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="Seu nome"
+            />
+          </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-1">
               Email
@@ -55,7 +67,7 @@ export default function Login() {
           </div>
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-1">
-              Senha
+              Senha (mín. 6 caracteres)
             </label>
             <input
               id="password"
@@ -63,6 +75,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full rounded-md border border-zinc-600 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="••••••••"
             />
@@ -72,13 +85,13 @@ export default function Login() {
             disabled={loading}
             className="mt-2 w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? "Cadastrando..." : "Cadastrar"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-zinc-400">
-          Não tem conta?{" "}
-          <Link href="/register" className="text-blue-400 hover:underline">
-            Cadastre-se
+          Já tem conta?{" "}
+          <Link href="/login" className="text-blue-400 hover:underline">
+            Entrar
           </Link>
         </p>
       </div>

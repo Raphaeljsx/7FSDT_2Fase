@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as postService from "@/lib/services/post.service";
+import { ensurePostsTable } from "@/lib/db/init";
 import { ValidationError } from "@/lib/errors";
 import { errorToResponse } from "@/lib/api/errorResponse";
 
 export async function GET(request: NextRequest) {
   try {
+    await ensurePostsTable();
     const { searchParams } = new URL(request.url);
     const searchQuery = searchParams.get("q") ?? searchParams.get("query");
 

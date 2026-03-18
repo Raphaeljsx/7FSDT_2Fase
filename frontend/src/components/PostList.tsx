@@ -31,10 +31,13 @@ export default function PostList({ searchQuery = "", onClearSearch }: PostListPr
       });
   }, []);
 
+  const authorDisplay = (p: PostType) =>
+    p.author?.name?.trim() || p.author?.email || "Anônimo";
+
   const filtered = !searchQuery?.trim()
     ? posts
     : posts.filter((p) =>
-        [p.title, p.content, p.author].some((field) =>
+        [p.title, p.content, authorDisplay(p)].some((field) =>
           String(field).toLowerCase().includes(searchQuery.trim().toLowerCase())
         )
       );
@@ -67,7 +70,9 @@ export default function PostList({ searchQuery = "", onClearSearch }: PostListPr
             <Link href={`/${item.id}`}>{item.title}</Link>
           </h2>
           <p className="text-gray-600">{item.content}</p>
-          <p className="text-gray-600 text-sm">{item.author}</p>
+          <p className="text-gray-600 text-sm">
+            {item.author?.name?.trim() || item.author?.email || "Anônimo"}
+          </p>
           <span className="text-gray-600 text-sm">
             {new Date(item.created_at).toLocaleDateString()}
           </span>

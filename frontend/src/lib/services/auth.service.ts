@@ -1,20 +1,47 @@
-import * as model from "../models/user.model";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { NotFoundError, UnauthorizedError } from "../errors";
-import type { userType } from "@/lib/types/User";
+import { setToken, removeToken } from "../api/client";
 
-export async function login(email: string, password: string): Promise<{token: string, user: userType}> {
-  const user = await model.findByEmailUser(email);
+export interface UserPublic {
+  id: number;
+  email: string;
+  name: string | null;
+  created_at: string;
+}
 
-  if (!user) throw new NotFoundError("Usuário não encontrado");
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) throw new UnauthorizedError("Senha inválida");
-  const token = jwt.sign(
-    {userId: user.id}, 
-    process.env.JWT_SECRET!, 
-    {expiresIn: process.env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn']}
-  );
+export interface AuthResponse {
+  user: UserPublic;
+  token: string;
+}
 
-  return {token, user};
+async function authFetch(path: string, body: object): Promise<AuthResponse> {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message ?? "Falha na requisição");
+  }
+
+  const data = await res.json();
+  if (data.token) setToken(data.token);
+  return { user: data.user, token: data.token };
+}
+
+export async function login(email: string, password: string): Promise<AuthResponse> {
+  const out = await authFetch("/api/auth/login", { email, password });
+  return out;
+}
+
+export async function register(data: {
+  email: string;
+  password: string;
+  name?: string;
+}): Promise<AuthResponse> {
+  return authFetch("/api/auth/register", data);
+}
+
+export function logout(): void {
+  removeToken();
 }
