@@ -3,7 +3,7 @@ import type {
   userType,
   userCreateType,
   userUpdateType,
-} from "../../app/Types/User";
+} from "../types/User";
 
 export async function findAllUsers(): Promise<userType[]> {
   const pool = getPool();
