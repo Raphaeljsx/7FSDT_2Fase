@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const user = await userModel.createUser({
       email: email.trim(),
-      password: passwordHash,
+      password_hash: passwordHash,
       name: name?.trim() ?? "",
     });
 

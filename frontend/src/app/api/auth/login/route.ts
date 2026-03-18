@@ -30,12 +30,13 @@ export async function POST(request: NextRequest) {
     const user = await userModel.findByEmailUser(email.trim());
     if (!user) throw new NotFoundError("Usuário não encontrado");
 
-    const valid = await bcrypt.compare(password, user.password);
+    const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) throw new UnauthorizedError("Senha inválida");
 
     const token = signToken(user.id);
     return NextResponse.json({ user: toPublic(user), token }, { status: 200 });
   } catch (error) {
+    console.error("[POST /api/auth/login]", error);
     return errorToResponse(error);
   }
 }

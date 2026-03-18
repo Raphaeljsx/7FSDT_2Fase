@@ -36,8 +36,8 @@ export async function findByEmailUser(
 export async function createUser(data: userCreateType): Promise<userType> {
   const pool = getPool();
   const result = await pool.query<userType>(
-    `INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
-    [data.name, data.email, data.password],
+    `INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING *`,
+    [data.name, data.email, data.password_hash],
   );
   return result.rows[0];
 }

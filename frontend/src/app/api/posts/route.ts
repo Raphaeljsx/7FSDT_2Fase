@@ -14,6 +14,7 @@ export async function GET() {
     }
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
+    console.error("[GET /api/posts]", error);
     return errorToResponse(error);
   }
 }
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    console.error("[POST /api/posts]", error);
     return errorToResponse(error);
   }
 }
-

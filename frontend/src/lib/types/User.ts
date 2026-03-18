@@ -2,7 +2,7 @@ export interface userType {
   id: number;
   name: string;
   email: string;
-  password: string;
+  password_hash: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -10,13 +10,13 @@ export interface userType {
 export interface userCreateType {
   name: string;
   email: string;
-  password: string;
+  password_hash: string;
 }
 
 export interface userUpdateType {
   name?: string;
   email?: string;
-  password?: string;
+  password_hash?: string;
 }
 
 export interface userLoginType {
